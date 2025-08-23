@@ -1,0 +1,103 @@
+export type RoadmapKey = "frontend" | "backend" | "devops" | "datascience";
+
+export type Roadmap = {
+  slug: RoadmapKey;
+  title: string;
+  tagline: string;
+  skills: { id: string; label: string }[];
+};
+
+export const ROADMAPS: Record<RoadmapKey, Roadmap> = {
+  frontend: {
+    slug: "frontend",
+    title: "Frontend Developer",
+    tagline: "Build accessible, performant web UIs.",
+    skills: [
+      { id: "html-semantics", label: "Semantic HTML & ARIA basics" },
+      { id: "css-layouts", label: "CSS Flexbox & Grid layouts" },
+      { id: "responsive", label: "Responsive design & breakpoints" },
+      { id: "tailwind", label: "Tailwind CSS utility patterns" },
+      { id: "js-es6", label: "Modern JS (ES6+) fundamentals" },
+      { id: "ts-basics", label: "TypeScript types, generics, utility types" },
+      { id: "react-core", label: "React hooks, context, effects" },
+      { id: "next-routing", label: "Next.js App Router & data fetching" },
+      { id: "state-mgmt", label: "State mgmt (Zustand/Jotai/Redux) basics" },
+      { id: "forms", label: "Accessible forms & validation (React Hook Form)" },
+      { id: "a11y", label: "WCAG & keyboard accessibility" },
+      { id: "testing", label: "Component testing (Vitest/RTL)" },
+      { id: "perf", label: "Web performance & Lighthouse" },
+      { id: "auth", label: "Auth basics (JWT/OAuth flows conceptually)" },
+      { id: "deploy", label: "Vercel deploy & env config" },
+      { id: "project-portfolio", label: "Capstone: SaaS‑style dashboard UI" },
+    ],
+  },
+  devops: {
+    slug: "devops",
+    title: "DevOps Engineer",
+    tagline: "Ship reliably with CI/CD and cloud infrastructure.",
+    skills: [
+      { id: "linux", label: "Linux CLI & shell scripting" },
+      { id: "gitflow", label: "Git workflows & PR reviews" },
+      { id: "docker", label: "Dockerfiles & multi-stage builds" },
+      { id: "compose", label: "Docker Compose for local stacks" },
+      { id: "ci", label: "CI pipelines (GitHub Actions) basics" },
+      { id: "cd", label: "CD strategies (blue/green, canary)" },
+      { id: "k8s", label: "Kubernetes primitives (Deployments, Services)" },
+      { id: "infra", label: "IaC (Terraform) fundamentals" },
+      { id: "cloud", label: "Cloud basics (AWS/Azure/GCP) and IAM" },
+      { id: "monitor", label: "Observability (logs, metrics, traces)" },
+      { id: "secrets", label: "Secrets mgmt & env config" },
+      { id: "security", label: "Container & supply chain security" },
+      { id: "cost", label: "Cost awareness & autoscaling" },
+      { id: "sre", label: "SRE basics (SLIs/SLOs, error budgets)" },
+      { id: "incident", label: "Incident response & postmortems" },
+      { id: "project-ci", label: "Capstone: CI/CD for a sample app" },
+    ],
+  },
+  backend: {
+    slug: "backend",
+    title: "Backend Developer",
+    tagline: "Design APIs, data models, and services.",
+    skills: [
+      { id: "http-rest", label: "HTTP, REST, status codes" },
+      { id: "api-design", label: "API design (resource modeling)" },
+      { id: "node-express", label: "Node.js runtime & Express basics" },
+      { id: "sql", label: "SQL joins, indexes, transactions" },
+      { id: "orm", label: "Prisma/TypeORM basics" },
+      { id: "db-design", label: "Relational schema design & normalization" },
+      { id: "authz", label: "AuthN/AuthZ, sessions vs JWT" },
+      { id: "testing-api", label: "API tests (supertest) & mocking" },
+      { id: "queue", label: "Background jobs & queues" },
+      { id: "caching", label: "Caching (HTTP, Redis) strategies" },
+      { id: "logging", label: "Structured logging & tracing" },
+      { id: "security", label: "OWASP Top 10 for APIs" },
+      { id: "files", label: "File uploads & presigned URLs" },
+      { id: "docs", label: "OpenAPI/Swagger documentation" },
+      { id: "deploy", label: "Deploy to cloud PaaS" },
+      { id: "project-api", label: "Capstone: CRUD API with auth" },
+    ],
+  },
+  datascience: {
+    slug: "datascience",
+    title: "Data Scientist",
+    tagline: "From data wrangling to reproducible ML.",
+    skills: [
+      { id: "py-core", label: "Python data stack (NumPy, pandas)" },
+      { id: "viz", label: "Data visualization & EDA" },
+      { id: "stats", label: "Probability & statistics refresh" },
+      { id: "ml-basics", label: "ML pipeline & model selection" },
+      { id: "sklearn", label: "scikit‑learn API & workflows" },
+      { id: "validation", label: "Train/val/test splits & CV" },
+      { id: "feature", label: "Feature engineering patterns" },
+      { id: "metrics", label: "Metrics (AUC, F1, RMSE) & tradeoffs" },
+      { id: "nlp", label: "Text preprocessing & embeddings" },
+      { id: "time", label: "Time series basics" },
+      { id: "sql", label: "SQL for analytics" },
+      { id: "deploy", label: "Model packaging & serving basics" },
+      { id: "tracking", label: "Experiment tracking & reproducibility" },
+      { id: "ethics", label: "ML fairness & privacy basics" },
+      { id: "docs", label: "Communicating results & reports" },
+      { id: "project-ml", label: "Capstone: End‑to‑end ML mini‑project" },
+    ],
+  },
+};
