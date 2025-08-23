@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { theme } from "../../lib/theme";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   title: `${theme.universityName} – CareerLaunch`,
@@ -19,6 +20,7 @@ export default function UniversitiesLayout({
         {/* Header */}
         <Header />
         <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );
