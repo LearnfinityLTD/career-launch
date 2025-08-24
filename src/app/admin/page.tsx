@@ -1,14 +1,9 @@
 /* --- file: app/admin/page.tsx --- */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import {
-  sampleStudents,
-  type Student,
-  EmploymentStatus,
-} from "../../lib/demoData";
+import { useMemo, useState } from "react";
+import { sampleStudents, type Student } from "../../lib/demoData";
 import { theme } from "../../lib/theme";
-import StudentModal from "../components/StudentModal";
 import {
   ResponsiveContainer,
   LineChart,
@@ -31,39 +26,33 @@ import {
   Building2,
   Download,
   Filter,
-  LogIn,
   LockKeyhole,
-  Users,
-  PoundSterling,
+  Award,
+  Target,
+  AlertTriangle,
+  Calendar,
+  Star,
+  ArrowUp,
+  ArrowDown,
+  Minus,
 } from "lucide-react";
 
-const ADMIN_PASSWORD = "career2025"; // demo only
-const COLORS = ["#1d4ed8", "#10b981", "#f59e0b", "#ef4444"]; // primary + accents
-
-const fallbackTheme = {
-  colors: { primary: "#1d4ed8" },
-  universityName: "CareerLaunch Partner",
-  logoUrl: "",
-};
+const ADMIN_PASSWORD = "career2025";
+const COLORS = ["#1d4ed8", "#10b981", "#f59e0b", "#ef4444"];
 
 export default function AdminPage() {
-  const t = { ...fallbackTheme, ...(theme || {}) } as typeof fallbackTheme;
-
   const [authed, setAuthed] = useState(false);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students] = useState<Student[]>(sampleStudents);
   const [selected, setSelected] = useState<Student | null>(null);
 
   // Filters
   const [track, setTrack] = useState<"all" | Student["roadmap"]>("all");
   const [year, setYear] = useState<number | "all">("all");
-  const [benchmark, setBenchmark] = useState(78); // sector employment benchmark (%)
+  const [benchmark, setBenchmark] = useState(78);
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("students") || "null");
-    setStudents(stored && stored.length ? stored : sampleStudents);
-  }, []);
+  // Historical data for trends
+  const [previousPeriodEmploymentRate] = useState(65);
 
-  // ---------- Derived data ----------
   const filtered = useMemo(() => {
     return students.filter(
       (s) =>
@@ -73,16 +62,24 @@ export default function AdminPage() {
   }, [students, track, year]);
 
   const total = filtered.length;
-
   const employedCount = filtered.filter(
     (s) => s.employmentStatus === "Employed"
   ).length;
   const employmentRate = total ? Math.round((employedCount / total) * 100) : 0;
+  const employmentTrend = employmentRate - previousPeriodEmploymentRate;
 
-  const employmentData = useMemo<
-    { status: EmploymentStatus; value: number }[]
-  >(() => {
-    const groups: Record<EmploymentStatus, number> = {
+  // Enhanced metrics
+  const totalRevenueGenerated = employedCount * 38000; // Lifetime graduate value
+  const roiInvestment = 5000;
+  const roiMultiple = roiInvestment
+    ? (totalRevenueGenerated / roiInvestment).toFixed(1)
+    : "-";
+
+  // League table impact calculation
+  const leagueTableImpact = Math.max(0, Math.round((employmentRate - 65) / 5));
+
+  const employmentData = useMemo(() => {
+    const groups: Record<string, number> = {
       Employed: 0,
       Seeking: 0,
       "Further Study": 0,
@@ -90,9 +87,7 @@ export default function AdminPage() {
     filtered.forEach((s) => {
       groups[s.employmentStatus] += 1;
     });
-    return (Object.entries(groups) as [EmploymentStatus, number][]).map(
-      ([status, value]) => ({ status, value })
-    );
+    return Object.entries(groups).map(([status, value]) => ({ status, value }));
   }, [filtered]);
 
   const stackedCompletion = useMemo(() => {
@@ -141,22 +136,7 @@ export default function AdminPage() {
     }));
   }, [filtered]);
 
-  // Salary + ROI (demo model)
-  const avgSalaryBase = 32000; // sector baseline starting salary
-  const avgSalaryUplift = 6000; // CareerLaunch uplift assumption
-  const salaryWithCL = avgSalaryBase + avgSalaryUplift;
-  const roiAnnualBenefit = Math.round(employedCount * avgSalaryUplift);
-  const roiInvestment = 5000; // demo Professional plan
-  const roiMultiple = roiInvestment
-    ? (roiAnnualBenefit / roiInvestment).toFixed(1)
-    : "-";
-
-  const rankingImpact = Math.max(
-    0,
-    Math.round((employmentRate - benchmark) / 2)
-  ); // rough demo heuristic
-
-  // At-risk / anomaly detection (demo)
+  // Risk analysis
   const atRisk = filtered.filter(
     (s) => s.employmentStatus === "Seeking" && s.progress < 30
   );
@@ -170,7 +150,6 @@ export default function AdminPage() {
     return deltaDays > 10 && last.progress - prev.progress < 2;
   });
 
-  // Export CSV
   const exportCSV = () => {
     const headers = [
       "Name",
@@ -204,23 +183,21 @@ export default function AdminPage() {
     URL.revokeObjectURL(url);
   };
 
-  // ---------- Auth gate ----------
   if (!authed) {
     return (
       <section className="mx-auto max-w-sm px-4 py-16">
         <div className="mb-6 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg" />
-          {t.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
+          {theme.logoUrl && (
             <img
-              src={t.logoUrl}
-              alt={`${t.universityName} logo`}
-              className="h-8 w-auto"
+              src={theme.logoUrl}
+              alt={`${theme.universityName} logo`}
+              className="h-10 w-auto"
             />
           )}
-          <h1 className="text-xl font-bold">
-            University Dashboard – {t.universityName}
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold">University Dashboard</h1>
+            <p className="text-sm text-slate-600">{theme.universityName}</p>
+          </div>
         </div>
 
         <div className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-slate-700">
@@ -241,12 +218,11 @@ export default function AdminPage() {
           Press Enter after typing password
         </p>
 
-        {/* Fake SSO banner */}
         <div className="mt-6 flex items-center gap-3 rounded-xl border bg-white p-4">
           <ShieldCheck className="h-5 w-5 text-emerald-600" />
           <div>
             <div className="text-sm font-semibold">
-              Single Sign-On available
+              Single Sign-On Available
             </div>
             <div className="text-xs text-slate-500">
               SAML/SCIM integration with Azure AD & Okta in Enterprise.
@@ -257,37 +233,40 @@ export default function AdminPage() {
     );
   }
 
-  // ---------- Main UI ----------
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
       {/* Header */}
       <header className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          {t.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={t.logoUrl} alt="Uni logo" className="h-10 w-auto" />
+          {theme.logoUrl && (
+            <img
+              src={theme.logoUrl}
+              alt="University logo"
+              className="h-12 w-auto"
+            />
           )}
           <div>
-            <h1 className="text-2xl font-bold">
-              University Dashboard – {t.universityName}
-            </h1>
+            <h1 className="text-2xl font-bold">University Dashboard</h1>
             <p className="text-sm text-slate-500">
-              Cohort health • Outcomes • ROI
+              {theme.universityName} • Cohort Health • Outcomes • ROI
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <div
             className="rounded-md border px-3 py-1"
-            style={{ borderColor: t.colors.primary, color: t.colors.primary }}
+            style={{
+              borderColor: theme.colors.primary,
+              color: theme.colors.primary,
+            }}
           >
-            Demo
+            Demo Mode
           </div>
         </div>
       </header>
 
       {/* Filters */}
-      <div className="mb-6 grid gap-3 md:grid-cols-4">
+      <div className="mb-6 grid gap-3 md:grid-cols-5">
         <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
           <Filter className="h-4 w-4" /> Track
           <select
@@ -295,7 +274,7 @@ export default function AdminPage() {
             onChange={(e) => setTrack(e.target.value as any)}
             className="ml-auto rounded border px-2 py-1 text-sm"
           >
-            <option value="all">All</option>
+            <option value="all">All Tracks</option>
             <option value="frontend">Frontend</option>
             <option value="backend">Backend</option>
             <option value="devops">DevOps</option>
@@ -303,8 +282,7 @@ export default function AdminPage() {
           </select>
         </div>
         <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
-          {" "}
-          Year
+          <Calendar className="h-4 w-4" /> Year
           <select
             value={year}
             onChange={(e) =>
@@ -312,7 +290,7 @@ export default function AdminPage() {
             }
             className="ml-auto rounded border px-2 py-1 text-sm"
           >
-            <option value="all">All</option>
+            <option value="all">All Years</option>
             {[...new Set(students.map((s) => s.graduationYear))]
               .sort()
               .map((y) => (
@@ -323,8 +301,7 @@ export default function AdminPage() {
           </select>
         </div>
         <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
-          {" "}
-          Sector benchmark
+          <Target className="h-4 w-4" /> Benchmark
           <input
             type="number"
             min={0}
@@ -343,58 +320,89 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* KPI cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      {/* Enhanced KPI Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPI
-          title="Employment rate (6-mo)"
+          title="Employment Rate (6-mo)"
           value={`${employmentRate}%`}
-          sub={`${employmentRate - benchmark >= 0 ? "+" : ""}${
-            employmentRate - benchmark
-          }% vs sector`}
+          sub={`${
+            employmentTrend >= 0 ? "+" : ""
+          }${employmentTrend}% vs last year • ${
+            employmentRate - benchmark >= 0 ? "+" : ""
+          }${employmentRate - benchmark}% vs sector`}
           icon={<TrendingUp className="h-5 w-5" />}
-          color={t.colors.primary}
+          color={theme.colors.primary}
+          trend={employmentTrend}
         />
+
         <KPI
-          title="Avg progress (cohort)"
-          value={`${avgOf(filtered.map((s) => s.progress))}%`}
-          sub={`${filtered.length} students`}
-          icon={<Users className="h-5 w-5" />}
+          title="Revenue Generated (est.)"
+          value={`£${format(totalRevenueGenerated)}`}
+          sub={`Total economic impact • ${employedCount} graduates employed`}
+          icon={<Award className="h-5 w-5" />}
           color="#10b981"
         />
+
         <KPI
-          title="Salary uplift (est.)"
-          value={`£${format(roiAnnualBenefit)}`}
-          sub={`£${format(avgSalaryBase)} → £${format(salaryWithCL)}`}
-          icon={<PoundSterling className="h-5 w-5" />}
-          color="#f59e0b"
-        />
-        <KPI
-          title="Ranking impact (est.)"
-          value={`+${rankingImpact}`}
-          sub={`vs ${benchmark}% sector`}
+          title="League Table Impact"
+          value={`+${leagueTableImpact} positions`}
+          sub={`Est. ranking improvement • ROI: ${roiMultiple}x`}
           icon={<Building2 className="h-5 w-5" />}
-          color="#6366f1"
+          color="#8b5cf6"
         />
       </div>
+
+      {/* Risk Alerts */}
+      {(atRisk.length > 0 || stagnating.length > 0) && (
+        <div className="mt-6 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-amber-900">Action Required</h3>
+              <div className="text-sm text-amber-800 space-y-1">
+                {atRisk.length > 0 && (
+                  <p>
+                    <strong>{atRisk.length} students</strong> are at risk
+                    (seeking employment, &lt;30% progress)
+                  </p>
+                )}
+                {stagnating.length > 0 && (
+                  <p>
+                    <strong>{stagnating.length} students</strong> showing
+                    stagnant progress (&gt;10 days, &lt;2% improvement)
+                  </p>
+                )}
+                <p className="font-medium">
+                  Recommended: Schedule intervention meetings with academic
+                  advisors
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Charts */}
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <div className="rounded-xl border bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-semibold">
-            Average Progress Over Time
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Progress Trajectory</h2>
+            <div className="text-xs text-slate-500">
+              Cohort average over time
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={lineSeries} key={`line-${track}-${year}`}>
               <defs>
                 <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor={t.colors.primary}
+                    stopColor={theme.colors.primary}
                     stopOpacity={0.4}
                   />
                   <stop
                     offset="95%"
-                    stopColor={t.colors.primary}
+                    stopColor={theme.colors.primary}
                     stopOpacity={0}
                   />
                 </linearGradient>
@@ -405,7 +413,7 @@ export default function AdminPage() {
               <Area
                 type="monotone"
                 dataKey="avgProgress"
-                stroke={t.colors.primary}
+                stroke={theme.colors.primary}
                 fill="url(#grad)"
                 strokeWidth={2}
               />
@@ -414,7 +422,12 @@ export default function AdminPage() {
         </div>
 
         <div className="rounded-xl border bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-semibold">Employment Outcomes</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Employment Outcomes</h2>
+            <div className="text-xs text-slate-500">
+              6-month post-graduation
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart key={`pie-${track}-${year}`}>
               <Pie
@@ -437,9 +450,12 @@ export default function AdminPage() {
       </div>
 
       <div className="mt-6 rounded-xl border bg-white p-6 shadow">
-        <h2 className="mb-4 text-lg font-semibold">
-          Completion by Career Path
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Completion by Career Path</h2>
+          <div className="text-xs text-slate-500">
+            Average progress percentage
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={stackedCompletion} key={`bar-${track}-${year}`}>
             <XAxis dataKey="label" />
@@ -449,7 +465,7 @@ export default function AdminPage() {
             <Bar
               dataKey="completed"
               stackId="a"
-              fill={t.colors.primary}
+              fill={theme.colors.primary}
               name="Completed %"
             />
             <Bar
@@ -462,57 +478,77 @@ export default function AdminPage() {
         </ResponsiveContainer>
       </div>
 
-      {/* ROI callout */}
+      {/* ROI & Health Panel */}
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 rounded-xl border bg-white p-6 shadow">
-          <h2 className="mb-1 text-lg font-semibold">ROI Snapshot</h2>
+          <h2 className="mb-2 text-lg font-semibold">ROI Analysis</h2>
           <p className="mb-4 text-sm text-slate-600">
-            Based on current employed graduates and salary uplift assumptions.
+            Financial impact based on employed graduates.
           </p>
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold">
-                £{format(roiAnnualBenefit)}
+              <div className="text-xl font-bold">
+                £{format(totalRevenueGenerated)}
               </div>
-              <div className="text-xs text-slate-500">Annual salary uplift</div>
+              <div className="text-xs text-slate-500">
+                Total Revenue Generated
+              </div>
             </div>
             <div>
-              <div className="text-2xl font-bold">£{format(roiInvestment)}</div>
-              <div className="text-xs text-slate-500">Annual investment</div>
+              <div className="text-xl font-bold">£{format(roiInvestment)}</div>
+              <div className="text-xs text-slate-500">Annual Investment</div>
             </div>
             <div>
-              <div className="text-2xl font-bold">{roiMultiple}x</div>
-              <div className="text-xs text-slate-500">ROI multiple</div>
+              <div className="text-xl font-bold text-green-600">
+                {roiMultiple}x
+              </div>
+              <div className="text-xs text-slate-500">ROI Multiple</div>
             </div>
           </div>
         </div>
 
-        {/* Health panel */}
         <div className="rounded-xl border bg-white p-6 shadow">
-          <h2 className="mb-2 text-lg font-semibold">Cohort Health</h2>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center justify-between">
-              <span>At-risk (seeking &lt;30% progress)</span>
+          <h2 className="mb-3 text-lg font-semibold">Cohort Health</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span>At Risk</span>
+              </div>
               <span className="font-semibold">{atRisk.length}</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Stagnating (&gt;10d, &lt;2% delta)</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span>Stagnating</span>
+              </div>
               <span className="font-semibold">{stagnating.length}</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Total students</span>
-              <span className="font-semibold">{total}</span>
-            </li>
-          </ul>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span>On Track</span>
+              </div>
+              <span className="font-semibold">
+                {total - atRisk.length - stagnating.length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t">
+              <span className="font-medium">Total Students</span>
+              <span className="font-bold">{total}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Students table */}
+      {/* Students Table */}
       <div className="mt-6 rounded-xl border bg-white p-6 shadow">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Students</h2>
+          <h2 className="text-lg font-semibold">
+            Students ({filtered.length})
+          </h2>
           <span className="text-sm text-slate-500">
-            Click a row for details
+            Click a row for detailed profile
           </span>
         </div>
         <div className="overflow-x-auto">
@@ -524,24 +560,62 @@ export default function AdminPage() {
                 <th className="px-3 py-2">Year</th>
                 <th className="px-3 py-2">Track</th>
                 <th className="px-3 py-2">Progress</th>
-                <th className="px-3 py-2">Outcome</th>
+                <th className="px-3 py-2">Status</th>
+                <th className="px-3 py-2">Employer</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((s) => (
                 <tr
                   key={s.id}
-                  className="border-t hover:bg-slate-50 cursor-pointer"
+                  className={`border-t hover:bg-slate-50 cursor-pointer ${
+                    atRisk.includes(s)
+                      ? "bg-red-50"
+                      : stagnating.includes(s)
+                      ? "bg-amber-50"
+                      : ""
+                  }`}
                   onClick={() => setSelected(s)}
                 >
-                  <td className="px-3 py-2 font-medium text-slate-900">
+                  <td className="px-3 py-2 font-medium text-slate-900 flex items-center gap-2">
                     {s.name}
+                    {atRisk.includes(s) && (
+                      <AlertTriangle className="h-3 w-3 text-red-500" />
+                    )}
+                    {s.employmentStatus === "Employed" && (
+                      <Star className="h-3 w-3 text-yellow-500" />
+                    )}
                   </td>
                   <td className="px-3 py-2">{s.course}</td>
                   <td className="px-3 py-2">{s.graduationYear}</td>
                   <td className="px-3 py-2">{roadmapTitle(s.roadmap)}</td>
-                  <td className="px-3 py-2">{s.progress}%</td>
-                  <td className="px-3 py-2">{s.employmentStatus}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full"
+                          style={{ width: `${s.progress}%` }}
+                        ></div>
+                      </div>
+                      <span>{s.progress}%</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs ${
+                        s.employmentStatus === "Employed"
+                          ? "bg-green-100 text-green-800"
+                          : s.employmentStatus === "Seeking"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {s.employmentStatus}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2">
+                    {s.employer || <span className="text-slate-400">—</span>}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -549,24 +623,118 @@ export default function AdminPage() {
         </div>
       </div>
 
+      {/* Student Modal */}
       {selected && (
-        <StudentModal student={selected} onClose={() => setSelected(null)} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="text-xl font-bold">{selected.name}</h2>
+                <p className="text-slate-600">
+                  {selected.course} • {selected.graduationYear}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">
+                    Career Track
+                  </label>
+                  <p className="text-slate-900">
+                    {roadmapTitle(selected.roadmap)}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">
+                    Progress
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{ width: `${selected.progress}%` }}
+                      ></div>
+                    </div>
+                    <span className="font-medium">{selected.progress}%</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">
+                    Employment Status
+                  </label>
+                  <p className="text-slate-900">{selected.employmentStatus}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {selected.employer && (
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">
+                      Employer
+                    </label>
+                    <p className="text-slate-900">{selected.employer}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selected.progressHistory &&
+              selected.progressHistory.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-medium mb-3">Progress Timeline</h3>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart
+                      data={selected.progressHistory.map((p) => ({
+                        date: new Date(p.date).toLocaleDateString(),
+                        progress: p.progress,
+                      }))}
+                    >
+                      <XAxis dataKey="date" />
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="progress"
+                        stroke={theme.colors.primary}
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+          </div>
+        </div>
       )}
 
-      {/* Footer ribbon */}
-      <div className="mt-8 rounded-xl border bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-4 text-white">
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5" />
-            <span className="font-semibold">
-              TEF & accreditation-ready reporting
-            </span>
-            <span className="text-white/80">
-              • CSV export • Benchmarks • ROI
-            </span>
+      {/* Footer */}
+      <div className="mt-8 rounded-xl border bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-6 text-white">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-6 w-6" />
+            <div>
+              <div className="font-semibold text-lg">
+                TEF & Accreditation Ready
+              </div>
+              <div className="text-white/90 text-sm">
+                Comprehensive reporting • CSV exports • Benchmarking • ROI
+                analysis
+              </div>
+            </div>
           </div>
           <div className="text-sm">
-            Need enterprise SSO? Azure AD/Okta available in Enterprise.
+            <div className="font-medium">Enterprise Features Available:</div>
+            <div className="text-white/80">
+              Azure AD/Okta SSO • Advanced Analytics • Custom Branding
+            </div>
           </div>
         </div>
       </div>
@@ -580,28 +748,48 @@ function KPI({
   sub,
   icon,
   color,
+  trend,
 }: {
   title: string;
   value: string;
   sub?: string;
   icon?: React.ReactNode;
   color?: string;
+  trend?: number;
 }) {
   return (
-    <div className="rounded-xl border bg-white p-5 shadow">
+    <div className="rounded-xl border bg-white p-5 shadow hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm text-slate-500">{title}</div>
-          <div className="mt-1 text-2xl font-bold text-slate-900">{value}</div>
-          {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
+        <div className="flex-1">
+          <div className="text-sm text-slate-500 mb-1">{title}</div>
+          <div className="text-2xl font-bold text-slate-900 mb-1">{value}</div>
+          {sub && <div className="text-xs text-slate-500">{sub}</div>}
+          {trend !== undefined && (
+            <div
+              className={`flex items-center gap-1 mt-2 text-xs ${
+                trend > 0
+                  ? "text-green-600"
+                  : trend < 0
+                  ? "text-red-600"
+                  : "text-slate-500"
+              }`}
+            >
+              {trend > 0 ? (
+                <ArrowUp className="h-3 w-3" />
+              ) : trend < 0 ? (
+                <ArrowDown className="h-3 w-3" />
+              ) : (
+                <Minus className="h-3 w-3" />
+              )}
+              <span>{Math.abs(trend)}% vs last period</span>
+            </div>
+          )}
         </div>
         <div
-          className="h-10 w-10 rounded-xl"
+          className="h-12 w-12 rounded-xl flex items-center justify-center"
           style={{ background: `${color || "#1d4ed8"}20`, color }}
         >
-          <div className="flex h-full w-full items-center justify-center">
-            {icon}
-          </div>
+          {icon}
         </div>
       </div>
     </div>
@@ -611,11 +799,11 @@ function KPI({
 function roadmapTitle(slug: string) {
   switch (slug) {
     case "frontend":
-      return "Frontend";
+      return "Frontend Development";
     case "backend":
-      return "Backend";
+      return "Backend Development";
     case "devops":
-      return "DevOps";
+      return "DevOps Engineering";
     case "datascience":
       return "Data Science";
     default:
@@ -623,10 +811,6 @@ function roadmapTitle(slug: string) {
   }
 }
 
-function avgOf(nums: number[]) {
-  if (!nums.length) return 0;
-  return Math.round(nums.reduce((a, c) => a + c, 0) / nums.length);
-}
 function format(n: number) {
   return n.toLocaleString();
 }
