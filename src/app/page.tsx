@@ -12,27 +12,43 @@ import {
   Trophy,
   Star,
 } from "lucide-react";
+import Image from "next/image";
 
+// 1) Make the data specific per roadmap
 const roadmaps = [
   {
     slug: "frontend",
     title: "Frontend Developer",
+    imgSrc: "/paths/frontend.png",
+    imgAlt: "Frontend roadmap illustration",
     tags: ["React", "TypeScript", "A11y"],
+    description:
+      "Ship accessible, performant UIs with React and modern tooling.",
   },
   {
     slug: "backend",
     title: "Backend Developer",
+    imgSrc: "/paths/backend.png",
+    imgAlt: "Backend roadmap illustration",
     tags: ["APIs", "Databases", "Auth"],
+    description: "Design secure APIs, model data, and ship reliable services.",
   },
   {
     slug: "devops",
     title: "DevOps Engineer",
+    imgSrc: "/paths/devops.png",
+    imgAlt: "DevOps roadmap illustration",
     tags: ["Docker", "K8s", "CI/CD"],
+    description:
+      "Automate builds, deploy to cloud, and keep systems observable.",
   },
   {
     slug: "datascience",
     title: "Data Scientist",
+    imgSrc: "/paths/datascience.png",
+    imgAlt: "Data science roadmap illustration",
     tags: ["Pandas", "ML", "MLOps"],
+    description: "Turn data into decisions with solid ML baselines and MLOps.",
   },
 ];
 
@@ -61,7 +77,7 @@ export default function HomePage() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           <Link
-            href="/roadmap/frontend"
+            href="/#roadmaps"
             className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition inline-flex items-center gap-2 shadow-lg"
           >
             Start free roadmap
@@ -93,6 +109,7 @@ export default function HomePage() {
       </section>
 
       {/* Roadmap Grid — each card is a Link */}
+      {/* 2) Grid: small a11y + perf improvements */}
       <section id="roadmaps" className="max-w-7xl mx-auto px-6 pb-4">
         <h2 className="text-2xl font-bold text-slate-900 mb-4 text-center">
           Choose your path
@@ -103,38 +120,49 @@ export default function HomePage() {
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {roadmaps.map((rm) => (
+          {roadmaps.map((rm, i) => (
             <Link
               key={rm.slug}
               href={`/roadmap/${rm.slug}`}
+              aria-label={`Open ${rm.title} roadmap`}
               className="group rounded-2xl bg-white p-6 border border-slate-200 shadow hover:shadow-xl hover:border-blue-200 transition transform hover:-translate-y-0.5"
+              prefetch
             >
-              <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Target className="h-6 w-6 text-blue-600" />
-              </div>
+              <article className="h-full">
+                {/* Image wrapper: fixed height, object-contain */}
+                <div className="relative h-20 w-full mb-4">
+                  {/* Use next/image instead of <img> */}
+                  <Image
+                    src={rm.imgSrc}
+                    alt={rm.imgAlt}
+                    fill
+                    className="object-contain object-left"
+                    sizes="(min-width: 1024px) 220px, (min-width: 640px) 240px, 100vw"
+                    priority={i === 0}
+                  />
+                </div>
 
-              <h3 className="text-xl font-semibold text-slate-900">
-                {rm.title}
-              </h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Curated checkpoints, projects, and interview drills.
-              </p>
+                <h3 className="text-xl font-semibold text-slate-900">
+                  {rm.title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-600">{rm.description}</p>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {rm.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {rm.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
 
-              <div className="mt-5 inline-flex items-center gap-2 font-medium text-blue-600">
-                View roadmap
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </div>
+                <div className="mt-5 inline-flex items-center gap-2 font-medium text-blue-600">
+                  View roadmap
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </div>
+              </article>
             </Link>
           ))}
         </div>
@@ -244,14 +272,14 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/roadmap/frontend"
+              href="/#roadmaps"
               className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition inline-flex items-center gap-2 shadow-lg"
             >
               Start free
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              href="/login"
+              href="/auth/login"
               className="border-2 border-white text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition"
             >
               Sign in

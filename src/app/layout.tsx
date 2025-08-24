@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
         <Navbar audience="student" />
 
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-12">{children}</main>
         <Footer />
       </body>
     </html>

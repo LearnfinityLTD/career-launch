@@ -7,13 +7,13 @@ type NavbarProps = {
 
 export default function Navbar({ audience }: NavbarProps) {
   return (
-    <header className="border-b bg-white/95 backdrop-blur sticky top-0 z-50">
+    <header className="fixed inset-x-0 top-0 z-50 border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <div className="relative h-10 w-48 overflow-hidden">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="CareerLaunch logo"
               fill
               className="object-contain object-left"
@@ -42,7 +42,7 @@ export default function Navbar({ audience }: NavbarProps) {
               Pricing
             </a>
             <Link
-              href="/demo"
+              href="/universities/demo"
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Request Demo

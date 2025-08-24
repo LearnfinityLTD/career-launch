@@ -1,6 +1,7 @@
 /* --- file: components/Footer.tsx --- */
 import Link from "next/link";
 import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-white py-12">
@@ -94,9 +95,12 @@ export default function Footer() {
               <li>London, United Kingdom</li>
             </ul>
             <div className="mt-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
+              <Link
+                href="/universities/demo"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+              >
                 Book Demo Call
-              </button>
+              </Link>
             </div>
           </div>
         </div>

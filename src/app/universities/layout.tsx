@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { theme } from "../../lib/theme";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
 export const metadata: Metadata = {
@@ -16,12 +14,11 @@ export default function UniversitiesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-slate-50 text-slate-900 antialiased">
-        {/* Header */}
-        <Navbar audience="university" />
-        <main>{children}</main>
-      </body>
-    </html>
+    <>
+      <Navbar audience="university" />
+      <main className="bg-slate-50 text-slate-900 antialiased pt-12">
+        {children}
+      </main>
+    </>
   );
 }
