@@ -1,19 +1,32 @@
 /* --- file: components/Footer.tsx --- */
-import { GraduationCap } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3">
               <div
-                className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center"
+                className="h-10 w-10 rounded-xl flex items-center justify-center"
                 suppressHydrationWarning={true}
-              >
-                <GraduationCap className="h-4 w-4 text-white" />
-              </div>
-              <span className="font-bold text-lg">CareerLaunch</span>
+              ></div>
+              <Link href="/" className="inline-block mb-3 mr-20">
+                <div className="relative h-10 w-56 overflow-hidden">
+                  <Image
+                    src="/logo-no-background.png"
+                    alt="CareerLaunch logo"
+                    fill
+                    className="object-contain object-left"
+                    priority
+                    style={{
+                      transform: "scale(5) translateY(1px)",
+                      transformOrigin: "left center",
+                    }}
+                  />
+                </div>
+              </Link>
             </div>
             <p className="text-slate-400 text-sm">
               Transforming university graduate outcomes through structured

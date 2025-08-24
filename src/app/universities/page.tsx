@@ -18,6 +18,7 @@ import {
   Download,
   Calculator,
 } from "lucide-react";
+import Link from "next/link";
 
 const LandingPage = () => {
   const [selectedMetric, setSelectedMetric] = useState("employment");
@@ -92,15 +93,24 @@ const LandingPage = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition flex items-center gap-2 shadow-lg">
+            {/* Demo CTA */}
+            <Link
+              href="/demo"
+              className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition flex items-center gap-2 shadow-lg"
+            >
               <Phone className="h-5 w-5" />
               Schedule Strategic Demo
               <ArrowRight className="h-5 w-5" />
-            </button>
-            <button className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-slate-400 transition flex items-center gap-2">
+            </Link>
+
+            {/* ROI CTA */}
+            <Link
+              href="/roi"
+              className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-slate-400 transition flex items-center gap-2"
+            >
               <Calculator className="h-5 w-5" />
               Calculate Your ROI
-            </button>
+            </Link>
           </div>
 
           {/* Trust Indicators */}

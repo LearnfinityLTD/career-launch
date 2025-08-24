@@ -1,4 +1,5 @@
-import { GraduationCap } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   return (
@@ -7,12 +8,27 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center"
+            className="h-10 w-10 rounded-xl flex items-center justify-center"
             suppressHydrationWarning={true}
+          ></div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 hover:text-slate-900"
           >
-            <GraduationCap className="h-5 w-5 text-white" />
-          </div>
-          <span className="font-bold text-xl text-slate-900">CareerLaunch</span>
+            <div className="relative h-10 w-56 overflow-hidden">
+              <Image
+                src="/logo.svg"
+                alt="CareerLaunch logo"
+                fill
+                className="object-contain object-left"
+                priority
+                style={{
+                  transform: "scale(5) translateY(1px)",
+                  transformOrigin: "left center",
+                }}
+              />
+            </div>
+          </Link>
         </div>
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
           <a href="#features" className="hover:text-slate-900 transition">
